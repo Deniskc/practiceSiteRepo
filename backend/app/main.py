@@ -1,11 +1,40 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
+from app.api import cases_router, countries_router, technologies_router, auth_router
 
-app = FastAPI(title="Цифровая оптимизация промышленных предприятий", version="1.0.0")
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+)
 
-@app.get("/test")
-def test():
-    return {"message": "dev server", "status": "work"}
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Подключение всех роутеров
+app.include_router(cases_router)
+app.include_router(countries_router)
+app.include_router(technologies_router)
+app.include_router(auth_router)
+
+# Health check
+@app.get("/ping")
+def ping():
+    return {"message": "pong", "status": "ok"}
 
 @app.get("/")
 def root():
-    return {"message": "API is running", "docs": "/docs"}
+    return {
+        "message": f"{settings.app_name} API is running",
+        "version": settings.app_version,
+        "docs": "/docs",
+    }
