@@ -7,10 +7,6 @@ from app.schemas import CaseCreate, CaseUpdate, CaseResponse
 
 router = APIRouter(prefix="/api/cases", tags=["cases"])
 
-# ============================================
-# ПУБЛИЧНЫЕ ЭНДПОИНТЫ (доступны всем)
-# ============================================
-
 @router.get("/", response_model=List[CaseResponse])
 def get_cases(
     country: Optional[str] = Query(None, description="Фильтр по стране"),
@@ -54,14 +50,9 @@ def get_case(case_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Case not found")
     return case
 
-# ============================================
-# АДМИНСКИЕ ЭНДПОИНТЫ (только для админов)
-# ============================================
-
 @router.post("/admin/cases", response_model=CaseResponse, status_code=201)
 def create_case(case_data: CaseCreate, db: Session = Depends(get_db)):
-    """Создать новый кейс (только админ)"""
-    # TODO: добавить проверку авторизации
+
     return case_service.create_case(db, case_data)
 
 @router.put("/admin/cases/{case_id}", response_model=CaseResponse)
@@ -70,7 +61,6 @@ def update_case(
     case_data: CaseUpdate,
     db: Session = Depends(get_db)
 ):
-    """Обновить кейс (только админ)"""
     case = case_service.update_case(db, case_id, case_data)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
@@ -78,7 +68,6 @@ def update_case(
 
 @router.delete("/admin/cases/{case_id}", status_code=204)
 def delete_case(case_id: int, db: Session = Depends(get_db)):
-    """Удалить кейс (только админ)"""
     deleted = case_service.delete_case(db, case_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Case not found")

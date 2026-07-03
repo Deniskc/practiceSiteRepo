@@ -20,9 +20,7 @@ def get_cases(
     skip: int = 0,
     limit: int = 20,
 ) -> List[Case]:
-    """
-    Получить список кейсов с фильтрацией, поиском и сортировкой
-    """
+    
     query = db.query(Case).options(
         joinedload(Case.country),
         joinedload(Case.technologies),
@@ -30,7 +28,7 @@ def get_cases(
         joinedload(Case.verifier),
     )
     
-    # --- ФИЛЬТРЫ ---
+    # --- фильтры ---
     if country:
         query = query.join(Country).filter(Country.name == country)
     if technology:
@@ -51,7 +49,7 @@ def get_cases(
         else:
             query = query.filter(Case.measurable_result.is_(None))
     
-    # --- ПОИСК ---
+    # --- поиск ---
     if search:
         query = query.filter(
             or_(
@@ -62,7 +60,7 @@ def get_cases(
             )
         )
     
-    # --- СОРТИРОВКА ---
+    # --- сортировка ---
     sort_mapping = {
         "created_at": Case.created_at,
         "updated_at": Case.updated_at,
@@ -86,12 +84,11 @@ def get_cases(
     else:
         query = query.order_by(asc(sort_field))
     
-    # --- ПАГИНАЦИЯ ---
+    # --- пагинация ---
     return query.offset(skip).limit(limit).all()
 
 
 def get_case_by_id(db: Session, case_id: int) -> Optional[Case]:
-    """Получить один кейс по ID"""
     return db.query(Case).options(
         joinedload(Case.country),
         joinedload(Case.technologies),
@@ -101,17 +98,13 @@ def get_case_by_id(db: Session, case_id: int) -> Optional[Case]:
 
 
 def create_case(db: Session, case_data: CaseCreate) -> Case:
-    """Создать новый кейс"""
-    # Извлекаем technology_ids из данных
+
     tech_ids = case_data.technology_ids
     case_dict = case_data.model_dump(exclude={"technology_ids"})
     
-    # Создаём кейс
     case = Case(**case_dict)
     db.add(case)
-    db.flush()  # Получаем ID кейса
     
-    # Добавляем связи с технологиями (многие-ко-многим)
     for tech_id in tech_ids:
         db.add(CaseTechnology(case_id=case.id, technology_id=tech_id))
     
@@ -121,21 +114,17 @@ def create_case(db: Session, case_data: CaseCreate) -> Case:
 
 
 def update_case(db: Session, case_id: int, case_data: CaseUpdate) -> Optional[Case]:
-    """Обновить кейс"""
     case = db.query(Case).filter(Case.id == case_id).first()
+
     if not case:
         return None
     
-    # Обновляем поля
     update_data = case_data.model_dump(exclude_unset=True, exclude={"technology_ids"})
     for key, value in update_data.items():
         setattr(case, key, value)
     
-    # Обновляем технологии (если переданы)
     if case_data.technology_ids is not None:
-        # Удаляем старые связи
         db.query(CaseTechnology).filter(CaseTechnology.case_id == case_id).delete()
-        # Добавляем новые
         for tech_id in case_data.technology_ids:
             db.add(CaseTechnology(case_id=case_id, technology_id=tech_id))
     
@@ -145,7 +134,6 @@ def update_case(db: Session, case_id: int, case_data: CaseUpdate) -> Optional[Ca
 
 
 def delete_case(db: Session, case_id: int) -> bool:
-    """Удалить кейс"""
     case = db.query(Case).filter(Case.id == case_id).first()
     if not case:
         return False

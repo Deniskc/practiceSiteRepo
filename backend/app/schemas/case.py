@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
+from app.schemas import TechnologyResponse 
 
 class TrustLevel(str, Enum):
     A = "A"
@@ -24,7 +25,7 @@ class CaseBase(BaseModel):
     facility_type: str
     business_problem: str
     problem_description: str
-    technology_ids: List[int]  # ← массив ID технологий
+    technology_ids: List[int]  
     it_systems: Optional[str] = None
     solution_description: str
     implementation_stages: Optional[str] = None
@@ -79,7 +80,9 @@ class CaseResponse(CaseBase):
     verification_date: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
-    technologies: Optional[List[dict]] = None
+    technology_ids: List[int] = [] 
+    technologies: Optional[List[TechnologyResponse]] = None
+
 
     class Config:
         from_attributes = True

@@ -11,7 +11,6 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -20,16 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Подключение всех роутеров
 app.include_router(cases_router)
 app.include_router(countries_router)
 app.include_router(technologies_router)
 app.include_router(auth_router)
-
-# Health check
-@app.get("/ping")
-def ping():
-    return {"message": "pong", "status": "ok"}
 
 @app.get("/")
 def root():

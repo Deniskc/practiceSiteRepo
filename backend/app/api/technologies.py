@@ -9,5 +9,4 @@ router = APIRouter(prefix="/api/technologies", tags=["technologies"])
 
 @router.get("/", response_model=List[TechnologyResponse])
 def get_technologies(db: Session = Depends(get_db)):
-    """Получить список всех технологий"""
     return db.query(Technology).all()

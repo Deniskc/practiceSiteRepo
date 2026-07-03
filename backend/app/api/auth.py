@@ -1,7 +1,11 @@
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
 from sqlalchemy.orm import Session
-from datetime import timedelta
+
+
 from app.core.database import get_db
 from app.services import auth_service
 from app.schemas import UserCreate, UserResponse, Token
@@ -10,10 +14,9 @@ from app.models import User
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
+
 @router.post("/register", response_model=UserResponse, status_code=201)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    """Регистрация нового пользователя"""
-    # Проверка, что пользователь не существует
     existing_user = db.query(User).filter(User.username == user_data.username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -22,12 +25,12 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already exists")
     return auth_service.create_user(db, user_data)
 
+
 @router.post("/login", response_model=Token)
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    """Вход в систему (получение JWT-токена)"""
     user = auth_service.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(

@@ -7,19 +7,12 @@ from sqlalchemy import pool
 
 from alembic import context
 
-# ===== ЭТА ЧАСТЬ ВАЖНА =====
-# Добавляем путь к папке backend (где лежит app/)
 sys.path.append(str(Path(__file__).parent.parent))
-
-# Импортируем БАЗОВЫЙ класс и ВСЕ модели
 from app.core.database import Base
-from app.models import Country, Technology, User, Case  # ← явный импорт
-# ============================
+from app.models import *
 
-# Метаданные для миграций
 target_metadata = Base.metadata
 
-# Остальной код (не меняй)
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
