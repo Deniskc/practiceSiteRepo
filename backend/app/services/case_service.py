@@ -112,7 +112,6 @@ def create_case(db: Session, case_data: CaseCreate) -> Case:
     db.refresh(case)
     return case
 
-
 def update_case(db: Session, case_id: int, case_data: CaseUpdate) -> Optional[Case]:
     case = db.query(Case).filter(Case.id == case_id).first()
 
