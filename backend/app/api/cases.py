@@ -24,7 +24,7 @@ def get_cases(
     limit: int = Query(20, ge=1, le=100, description="Количество записей на странице"),
     db: Session = Depends(get_db),
 ):
-    """Получить список кейсов с фильтрацией, поиском и сортировкой"""
+
     return case_service.get_cases(
         db=db,
         country=country,

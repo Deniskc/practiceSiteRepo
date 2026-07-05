@@ -32,18 +32,18 @@ class Case(Base):
     industry = Column(String(100), nullable=False)
     facility_type = Column(String(100), nullable=False)
     
-    business_problem = Column(String(200), nullable=False)
+    business_problem = Column(Text  , nullable=False)
     problem_description = Column(Text, nullable=False)
     
-    it_systems = Column(String(200), nullable=True)
+    it_systems = Column(Text, nullable=True)
     solution_description = Column(Text, nullable=False)
     implementation_stages = Column(Text, nullable=True)
     
-    measurable_result = Column(String(100), nullable=True)
-    result_unit = Column(String(50), nullable=True)
+    measurable_result = Column(Text, nullable=True)
+    result_unit = Column(String(60), nullable=True)
     result_period = Column(String(50), nullable=True)
-    initial_value = Column(String(50), nullable=True)
-    final_value = Column(String(50), nullable=True)
+    initial_value = Column(Text, nullable=True)
+    final_value = Column(Text, nullable=True)
     
     limitations = Column(Text, nullable=True)
     applicability = Column(Text, nullable=True)
